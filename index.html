@@ -266,6 +266,7 @@
 
 <script>
   var currentSeq = 'Seq1';
+  var preloadedGifs = {};
   
   const gifData = {
     'query': 'query.gif',
@@ -291,10 +292,8 @@
     });
     document.getElementById(seq).className = 'button seq-btn is-info is-rounded';
     
-    // Load all GIFs for this sequence
+    // Preload all GIFs for this sequence
     const basePath = 'static/GIFs/' + seq + '/';
-    const timestamp = new Date().getTime(); // Cache buster
-    
     const gifElements = {
       'query': document.getElementById('gif-query'),
       'mask': document.getElementById('gif-mask'),
@@ -307,15 +306,98 @@
       'vggt': document.getElementById('gif-vggt')
     };
     
-    // Clear and reload all GIFs with cache buster
-    Object.entries(gifData).forEach(([key, filename]) => {
-      const element = gifElements[key];
-      if (element) {
-        // Clear the src first to ensure reload
-        element.src = '';
-        // Set new src with cache buster
-        element.src = basePath + filename + '?t=' + timestamp;
+    // Clear current images immediately to stop any playing GIFs
+    // Save current dimensions to prevent layout shift
+    Object.values(gifElements).forEach(el => {
+      if (el.offsetHeight > 0) {
+        el.style.minHeight = el.offsetHeight + 'px';
       }
+      el.style.visibility = 'hidden';
+      el.src = '';
+    });
+    
+    // Clean up old blob URLs for previous sequence
+    Object.keys(preloadedGifs).forEach(key => {
+      if (preloadedGifs[key]) {
+        URL.revokeObjectURL(preloadedGifs[key]);
+      }
+    });
+    preloadedGifs = {};
+    
+    // Preload all GIFs in memory first using blob URLs
+    const preloadPromises = Object.entries(gifData).map(([key, filename]) => {
+      return new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', basePath + filename + '?t=' + new Date().getTime(), true);
+        xhr.responseType = 'blob';
+        xhr.timeout = 30000; // 30 second timeout for large files
+        
+        xhr.onload = function() {
+          if (this.status === 200) {
+            const blob = this.response;
+            // Verify blob is valid and is an image
+            if (blob && blob.size > 0 && blob.type.startsWith('image/')) {
+              const blobUrl = URL.createObjectURL(blob);
+              preloadedGifs[key] = blobUrl;
+              console.log('Successfully loaded:', filename, 'Size:', blob.size);
+            } else {
+              console.error('Invalid blob for:', filename, 'Type:', blob.type, 'Size:', blob.size);
+            }
+          } else {
+            console.error('HTTP error:', this.status, 'for', basePath + filename);
+          }
+          resolve();
+        };
+        
+        xhr.onerror = function() {
+          console.error('Network error loading:', basePath + filename);
+          resolve();
+        };
+        
+        xhr.ontimeout = function() {
+          console.error('Timeout loading:', basePath + filename);
+          resolve();
+        };
+        
+        xhr.onprogress = function(e) {
+          if (e.lengthComputable) {
+            console.log('Loading', filename, ':', Math.round((e.loaded / e.total) * 100) + '%');
+          }
+        };
+        
+        xhr.send();
+      });
+    });
+    
+    // Once all loaded, set sources simultaneously using requestAnimationFrame
+    Promise.all(preloadPromises).then(() => {
+      console.log('All GIFs loaded, preloaded count:', Object.keys(preloadedGifs).length);
+      
+      // Use requestAnimationFrame to ensure synchronous rendering
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Set all sources at once
+          Object.entries(gifData).forEach(([key, filename]) => {
+            if (preloadedGifs[key] && gifElements[key]) {
+              gifElements[key].src = preloadedGifs[key];
+              console.log('Set src for:', key);
+            } else if (gifElements[key]) {
+              // Fallback: if blob URL failed, try direct path
+              console.warn('Blob URL not available for:', key, '- using direct path');
+              gifElements[key].src = basePath + filename + '?t=' + new Date().getTime();
+            }
+          });
+          
+          // Make visible after a brief delay to ensure all are loaded
+          setTimeout(() => {
+            Object.values(gifElements).forEach(el => {
+              el.style.visibility = 'visible';
+              // Remove min-height constraint once loaded
+              el.style.minHeight = '';
+            });
+          }, 100);
+        });
+      });
     });
   }
   
