@@ -1,13 +1,13 @@
 <div align="center">
 
-<h1><a href="https://arxiv.org/abs/xxxx.xxxxx">PoseGAM: Robust Unseen Object Pose Estimation via Geometry-Aware Multi-View Reasoning</a></h1>
+<h1><a href="https://arxiv.org/abs/2512.10840">PoseGAM: Robust Unseen Object Pose Estimation via Geometry-Aware Multi-View Reasoning</a></h1>
 
 **[Jianqi Chen](https://windvchen.github.io/), [Biao Zhang](https://scholar.google.co.uk/citations?user=h5KukxEAAAAJ&hl=en&oi=ao), [Xiangjun Tang](https://scholar.google.co.uk/citations?user=9vZn91sAAAAJ&hl=en&oi=ao), and [Peter Wonka](https://scholar.google.co.uk/citations?user=0EKXSXgAAAAJ&hl=en)**
 
 ![](https://komarev.com/ghpvc/?username=windvchenPoseGAM&label=visitors)
 ![GitHub stars](https://badgen.net/github/stars/windvchen/PoseGAM)
 [![](https://img.shields.io/badge/license-MIT-blue)](#License)
-[![](https://img.shields.io/badge/arXiv-xxxx.xxxxx-b31b1b.svg)](https://arxiv.org/abs/xxxx.xxxxx)
+[![](https://img.shields.io/badge/arXiv-2512.10840-b31b1b.svg)](https://arxiv.org/abs/2512.10840)
 <a href='https://windvchen.github.io/PoseGAM/'>
   <img src='https://img.shields.io/badge/Project-Page-pink?style=flat&logo=Google%20chrome&logoColor=pink'></a>
 
@@ -49,10 +49,10 @@ If you encounter any question about the paper, please feel free to contact us. Y
 ## Citation & Acknowledgments
 If you find this paper useful in your research, please consider citing:
 ```
-@article{chen2025PoseGAM,
+@article{chen2025posegam,
   title={PoseGAM: Robust Unseen Object Pose Estimation via Geometry-Aware Multi-View Reasoning},
   author={Chen, Jianqi and Zhang, Biao and Tang, Xiangjun and Wonka, Peter},
-  journal={arXiv preprint arXiv:xxxx.xxxxx},
+  journal={arXiv preprint arXiv:2512.10840},
   year={2025}
 }
 ```
