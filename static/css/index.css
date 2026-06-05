@@ -213,3 +213,323 @@ div[style*="grid-template-columns"] > div:hover {
 .btn i {
   font-size: 16px;
 }
+
+/* Venue / Acceptance Badge (CVPR 2026 Oral) */
+.venue-badge-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 22px 0;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.venue-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 50%, #f093fb 100%);
+  background-size: 200% 200%;
+  color: #ffffff;
+  font-family: 'Google Sans', 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(240, 147, 251, 0.4),
+              0 3px 8px rgba(253, 160, 133, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  animation: venueShine 6s ease-in-out infinite;
+}
+
+.venue-badge i {
+  font-size: 20px;
+  color: #fffbe6;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.venue-badge-sep {
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+.venue-badge-highlight {
+  background: rgba(255, 255, 255, 0.95);
+  color: #b91c1c;
+  padding: 3px 14px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-shadow: none;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+@keyframes venueShine {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Code-coming-soon note under the action buttons */
+.code-note {
+  margin-top: 14px;
+  font-size: 14.5px;
+  color: #334155;
+  font-weight: 500;
+  font-style: italic;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: center;
+  width: 100%;
+}
+
+.code-note i {
+  color: #d97706;
+  font-style: normal;
+}
+
+/* Asterisk marker linking the Code button to the construction note */
+.code-asterisk {
+  font-size: 1em;
+  font-weight: 800;
+  margin-left: -2px;
+  vertical-align: super;
+  line-height: 0;
+  color: #ffd54a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.code-asterisk-note {
+  color: #eab308;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 1.1em;
+  margin-right: 3px;
+  line-height: 1;
+}
+
+/* ============================================================
+   Responsive / Mobile Adaptations
+   ============================================================ */
+
+/* Prevent any element from creating horizontal overflow on small screens */
+@media screen and (max-width: 1024px) {
+  html, body {
+    overflow-x: hidden;
+  }
+  img, model-viewer {
+    max-width: 100%;
+  }
+  .bibtex pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+}
+
+/* Tablet / small desktop */
+@media screen and (max-width: 900px) {
+  .publication-title {
+    font-size: 32px !important;
+    line-height: 1.25;
+    margin-bottom: 22px !important;
+  }
+
+  /* 3D Models row: two-up on tablets */
+  section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] {
+    flex: 0 1 47% !important;
+    min-width: 0 !important;
+  }
+
+  /* Method Comparison: 5-column grids -> 3 columns */
+  #gif-container > div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 14px !important;
+  }
+  /* Hide the empty placeholder div in the second row when columns change */
+  #gif-container > div[style*="grid-template-columns"]:nth-of-type(2) > div:first-child {
+    display: none !important;
+  }
+}
+
+/* Phones */
+@media screen and (max-width: 600px) {
+  .publication-title {
+    font-size: 24px !important;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    margin-bottom: 18px !important;
+  }
+
+  .nerf_subheader_v2 {
+    margin-top: 18px;
+    margin-bottom: 14px;
+  }
+  .nerf_authors_v2 {
+    font-size: 15px;
+  }
+  .nerf_affiliation_v2 {
+    font-size: 13.5px;
+    margin-top: 10px;
+    margin-bottom: 18px;
+  }
+
+  .external-link {
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .btn i {
+    font-size: 14px;
+  }
+
+  .venue-badge {
+    font-size: 15px;
+    padding: 8px 18px;
+    gap: 9px;
+  }
+  .venue-badge i {
+    font-size: 15px;
+  }
+  .venue-badge-highlight {
+    font-size: 13px;
+    padding: 2px 10px;
+  }
+  .venue-badge-wrapper {
+    margin-bottom: 16px;
+  }
+  .code-note {
+    font-size: 12.5px;
+    color: #334155;
+    margin-top: 10px;
+    padding: 0 8px;
+  }
+
+  /* Tighter section padding so content gets more horizontal room */
+  .section {
+    padding: 1.25rem 0.9rem !important;
+  }
+  .hero-body {
+    padding: 1.75rem 0.9rem 0.5rem !important;
+  }
+  .w-container,
+  .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Section headings */
+  .grey-heading_nerf,
+  .title.is-3,
+  .title.is-4 {
+    font-size: 22px !important;
+    padding-bottom: 12px;
+  }
+  .title.is-5 {
+    font-size: 16px !important;
+  }
+
+  /* Intro paragraphs under headings */
+  section p[style*="font-size: 18px"] {
+    font-size: 15px !important;
+  }
+
+  /* 3D Models: stack as 2 columns on phones too (use full width pairs) */
+  section .columns .column > div[style*="flex-wrap: wrap"] {
+    gap: 12px !important;
+  }
+  section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] {
+    flex: 0 1 47% !important;
+    min-width: 0 !important;
+  }
+  section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] p {
+    font-size: 13px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Method Comparison grids: 2 columns on phones */
+  #gif-container > div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  #gif-container > div[style*="grid-template-columns"] > div p {
+    font-size: 13px !important;
+    margin-bottom: 8px !important;
+  }
+  #gif-container {
+    margin-bottom: 30px !important;
+  }
+
+  /* Sequence selector row */
+  section div[style*="margin-bottom: 40px"][style*="flex-wrap: wrap"] {
+    gap: 8px !important;
+    margin-bottom: 24px !important;
+  }
+  .button.seq-btn {
+    padding: 0.5em 1em !important;
+    font-size: 13px !important;
+  }
+
+  /* Notice banner */
+  section p[style*="background: #fff3cd"] {
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 22px !important;
+    display: block !important;
+    text-align: left !important;
+  }
+
+  /* Method overview caption */
+  .grid-container-1 p {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+  }
+  .grid-container-1 img {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Abstract paragraph */
+  .paragraph-3 {
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+  }
+
+  /* Bibtex */
+  .bibtex pre {
+    font-size: 11px !important;
+    padding: 10px !important;
+  }
+  .bibtex code {
+    font-size: 11px !important;
+  }
+
+  /* Disable hover lift on touch screens to avoid sticky transforms */
+  img:hover,
+  .btn:hover,
+  .button.seq-btn:hover,
+  model-viewer:hover,
+  div[style*="grid-template-columns"] > div:hover {
+    transform: none;
+  }
+}
+
+/* Very narrow phones */
+@media screen and (max-width: 380px) {
+  .publication-title {
+    font-size: 21px !important;
+  }
+  .grey-heading_nerf,
+  .title.is-3,
+  .title.is-4 {
+    font-size: 20px !important;
+  }
+  .btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+}
