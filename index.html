@@ -433,6 +433,22 @@
   
   // Re-match heights on window resize
   window.addEventListener('resize', matchViewerHeights);
+  // Also re-match once each sample image finishes decoding (important on
+  // mobile, where window.load can fire before image dimensions are settled)
+  ['sample1-img', 'sample2-img'].forEach(function(id) {
+    var img = document.getElementById(id);
+    if (img) {
+      if (img.complete) {
+        matchViewerHeights();
+      } else {
+        img.addEventListener('load', matchViewerHeights);
+      }
+    }
+  });
+  // Recompute on orientation change for phones/tablets
+  window.addEventListener('orientationchange', function() {
+    setTimeout(matchViewerHeights, 200);
+  });
 </script>
 
 <section class="section" style="padding: 1.5rem 1.5rem 2rem; background-color: #ffffff;">

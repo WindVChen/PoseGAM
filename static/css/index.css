@@ -313,58 +313,89 @@ div[style*="grid-template-columns"] > div:hover {
    Responsive / Mobile Adaptations
    ============================================================ */
 
-/* Prevent any element from creating horizontal overflow on small screens */
+/* Global overflow safeguards — prevent any element from forcing the
+   page wider than the viewport on small screens. */
 @media screen and (max-width: 1024px) {
   html, body {
     overflow-x: hidden;
+    max-width: 100vw;
   }
-  img, model-viewer {
+  img, model-viewer, video, iframe, pre {
     max-width: 100%;
+    box-sizing: border-box;
+  }
+  model-viewer {
+    min-width: 0;
+    width: 100% !important;
   }
   .bibtex pre {
     white-space: pre-wrap;
     word-break: break-word;
     overflow-x: auto;
   }
+  /* Title can grow long — make sure it always wraps */
+  .publication-title {
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
 }
 
-/* Tablet / small desktop */
-@media screen and (max-width: 900px) {
+/* Fluid title: scales smoothly from 21px on tiny phones to 42px on desktop.
+   Overrides the inline font-size:42px (only applies up to 1024px). */
+@media screen and (max-width: 1024px) {
   .publication-title {
-    font-size: 32px !important;
-    line-height: 1.25;
-    margin-bottom: 22px !important;
+    font-size: clamp(20px, 5.2vw, 36px) !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.3px;
+    margin-bottom: 18px !important;
+    padding: 0 6px;
   }
+}
 
+/* Tablet / large phone landscape */
+@media screen and (max-width: 1024px) {
   /* 3D Models row: two-up on tablets */
   section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] {
     flex: 0 1 47% !important;
     min-width: 0 !important;
   }
-
   /* Method Comparison: 5-column grids -> 3 columns */
   #gif-container > div[style*="grid-template-columns"] {
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 14px !important;
   }
-  /* Hide the empty placeholder div in the second row when columns change */
   #gif-container > div[style*="grid-template-columns"]:nth-of-type(2) > div:first-child {
     display: none !important;
   }
 }
 
-/* Phones */
-@media screen and (max-width: 600px) {
-  .publication-title {
-    font-size: 24px !important;
-    line-height: 1.25;
-    letter-spacing: -0.3px;
-    margin-bottom: 18px !important;
+/* Phones & small tablets (Bulma's mobile breakpoint) */
+@media screen and (max-width: 768px) {
+  /* Force Bulma containers/columns to release their padding so content
+     gets full horizontal room. */
+  .container,
+  .container.is-max-desktop,
+  .w-container,
+  .columns,
+  .column,
+  .hero-body,
+  .section {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .columns {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .column {
+    padding: 0.5rem !important;
   }
 
   .nerf_subheader_v2 {
-    margin-top: 18px;
-    margin-bottom: 14px;
+    margin-top: 16px;
+    margin-bottom: 12px;
   }
   .nerf_authors_v2 {
     font-size: 15px;
@@ -372,12 +403,12 @@ div[style*="grid-template-columns"] > div:hover {
   .nerf_affiliation_v2 {
     font-size: 13.5px;
     margin-top: 10px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .external-link {
     gap: 10px;
-    margin-top: 18px;
+    margin-top: 16px;
   }
   .btn {
     padding: 8px 14px;
@@ -407,19 +438,16 @@ div[style*="grid-template-columns"] > div:hover {
     color: #334155;
     margin-top: 10px;
     padding: 0 8px;
+    flex-wrap: wrap;
+    text-align: center;
   }
 
   /* Tighter section padding so content gets more horizontal room */
   .section {
-    padding: 1.25rem 0.9rem !important;
+    padding: 1.25rem 0.75rem !important;
   }
   .hero-body {
-    padding: 1.75rem 0.9rem 0.5rem !important;
-  }
-  .w-container,
-  .container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 1.5rem 0.75rem 0.5rem !important;
   }
 
   /* Section headings */
@@ -428,6 +456,7 @@ div[style*="grid-template-columns"] > div:hover {
   .title.is-4 {
     font-size: 22px !important;
     padding-bottom: 12px;
+    overflow-wrap: anywhere;
   }
   .title.is-5 {
     font-size: 16px !important;
@@ -435,19 +464,20 @@ div[style*="grid-template-columns"] > div:hover {
 
   /* Intro paragraphs under headings */
   section p[style*="font-size: 18px"] {
-    font-size: 15px !important;
+    font-size: 14.5px !important;
   }
 
-  /* 3D Models: stack as 2 columns on phones too (use full width pairs) */
+  /* 3D Models: keep two-up on phones; ensure children can shrink */
   section .columns .column > div[style*="flex-wrap: wrap"] {
-    gap: 12px !important;
+    gap: 10px !important;
   }
   section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] {
-    flex: 0 1 47% !important;
+    flex: 0 1 calc(50% - 6px) !important;
     min-width: 0 !important;
+    max-width: calc(50% - 6px) !important;
   }
   section .columns .column > div[style*="flex-wrap: wrap"] > div[style*="flex: 0 1 23%"] p {
-    font-size: 13px !important;
+    font-size: 12.5px !important;
     margin-bottom: 8px !important;
   }
 
@@ -455,37 +485,52 @@ div[style*="grid-template-columns"] > div:hover {
   #gif-container > div[style*="grid-template-columns"] {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
+    margin-top: 12px !important;
+  }
+  #gif-container > div[style*="grid-template-columns"] > div {
+    min-width: 0 !important;
   }
   #gif-container > div[style*="grid-template-columns"] > div p {
-    font-size: 13px !important;
-    margin-bottom: 8px !important;
+    font-size: 12.5px !important;
+    margin-bottom: 6px !important;
   }
   #gif-container {
-    margin-bottom: 30px !important;
+    margin-bottom: 24px !important;
+  }
+  #gif-container img {
+    width: 100% !important;
+    height: auto !important;
+    border-width: 1px !important;
+  }
+  #gif-ours {
+    border-width: 2px !important;
   }
 
   /* Sequence selector row */
   section div[style*="margin-bottom: 40px"][style*="flex-wrap: wrap"] {
     gap: 8px !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 22px !important;
   }
   .button.seq-btn {
-    padding: 0.5em 1em !important;
-    font-size: 13px !important;
+    padding: 0.45em 0.9em !important;
+    font-size: 12.5px !important;
   }
 
   /* Notice banner */
   section p[style*="background: #fff3cd"] {
-    font-size: 13px !important;
+    font-size: 12.5px !important;
     padding: 10px 14px !important;
-    margin-bottom: 22px !important;
+    margin: 0 0 20px 0 !important;
     display: block !important;
     text-align: left !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    line-height: 1.5 !important;
   }
 
   /* Method overview caption */
   .grid-container-1 p {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     line-height: 1.6 !important;
   }
   .grid-container-1 img {
@@ -495,20 +540,21 @@ div[style*="grid-template-columns"] > div:hover {
 
   /* Abstract paragraph */
   .paragraph-3 {
-    font-size: 15px !important;
+    font-size: 14.5px !important;
     line-height: 1.65 !important;
   }
 
   /* Bibtex */
   .bibtex pre {
-    font-size: 11px !important;
+    font-size: 10.5px !important;
     padding: 10px !important;
+    line-height: 1.4 !important;
   }
   .bibtex code {
-    font-size: 11px !important;
+    font-size: 10.5px !important;
   }
 
-  /* Disable hover lift on touch screens to avoid sticky transforms */
+  /* Disable hover lift on touch screens */
   img:hover,
   .btn:hover,
   .button.seq-btn:hover,
@@ -520,16 +566,15 @@ div[style*="grid-template-columns"] > div:hover {
 
 /* Very narrow phones */
 @media screen and (max-width: 380px) {
-  .publication-title {
-    font-size: 21px !important;
-  }
-  .grey-heading_nerf,
-  .title.is-3,
-  .title.is-4 {
-    font-size: 20px !important;
-  }
   .btn {
-    padding: 7px 12px;
+    padding: 7px 11px;
     font-size: 12px;
+  }
+  .nerf_authors_v2 {
+    font-size: 14px;
+  }
+  .button.seq-btn {
+    padding: 0.4em 0.75em !important;
+    font-size: 11.5px !important;
   }
 }
