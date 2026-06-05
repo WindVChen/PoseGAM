@@ -487,17 +487,20 @@ div[style*="grid-template-columns"] > div:hover {
     margin-bottom: 8px !important;
   }
 
-  /* Method Comparison grids: 2 columns on phones.
-     The original markup is split into two separate 5-column grids; on phones
-     we make them visually flow as one continuous 2-column list and fully
-     drop the desktop alignment placeholder. */
-  #gif-container > div[style*="grid-template-columns"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-    margin-top: 10px !important;
+  /* Method Comparison on phones: flatten both desktop rows into one
+     continuous 2-column flow, so GenFlow is followed by FoundPose. */
+  #gif-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 24px !important;
   }
-  #gif-container > div[style*="grid-template-columns"]:nth-of-type(2) {
-    margin-top: 10px !important;
+  #gif-container > #seq-title {
+    grid-column: 1 / -1;
+    margin-bottom: 10px !important;
+  }
+  #gif-container > div[style*="grid-template-columns"] {
+    display: contents !important;
   }
   #gif-container > div[style*="grid-template-columns"] > div {
     min-width: 0 !important;
