@@ -17,7 +17,7 @@
 
 ### Share us a :star: if this repo does help
 
-This is the official repository of ***PoseGAM***. We're actively organizing the code to enhance the user experience—stay tuned for updates! 🚀
+This is the official repository of ***PoseGAM*** (**CVPR 2026 Oral**). We're actively organizing the code to ensure a smooth release — **the full code release is expected by mid-June 2026**. Stay tuned! 🚀
 
 If you encounter any question about the paper, please feel free to contact us. You can create an issue or just send email to me windvchen@gmail.com. Also welcome for any idea exchange and discussion.
 
@@ -26,7 +26,7 @@ If you encounter any question about the paper, please feel free to contact us. Y
 
 [**2025/12/11**] Repository init.
 
-## TODO
+## TODO *(expected mid-June 2026)*
 - [ ] Dataset release
 - [ ] Code release
 
@@ -48,12 +48,12 @@ If you encounter any question about the paper, please feel free to contact us. Y
 
 ## Citation & Acknowledgments
 If you find this paper useful in your research, please consider citing:
-```
-@article{chen2025posegam,
+```bibtex
+@inproceedings{chen2026posegam,
   title={PoseGAM: Robust Unseen Object Pose Estimation via Geometry-Aware Multi-View Reasoning},
   author={Chen, Jianqi and Zhang, Biao and Tang, Xiangjun and Wonka, Peter},
-  journal={arXiv preprint arXiv:2512.10840},
-  year={2025}
+  booktitle={Proceedings of the Computer Vision and Pattern Recognition Conference},
+  year={2026}
 }
 ```
 
