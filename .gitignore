@@ -1,0 +1,8 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# OS / editor cruft
+.DS_Store
