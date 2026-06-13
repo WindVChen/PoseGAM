@@ -1,0 +1,234 @@
+defaults:
+  - default_dataset.yaml
+
+exp_name: exp001
+img_size: 518
+num_workers: 8
+seed_value: 42
+accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
+patch_size: 14
+val_epoch_freq: 5
+max_img_per_gpu: 48
+image_nums: [11, 24]  # Use a range of images for training
+
+limit_train_batches: 2000
+limit_val_batches: 200
+
+data:
+  train:
+    _target_: posegam.training.data.dynamic_dataloader.DynamicTorchDataset
+    num_workers: ${num_workers}
+    max_img_per_gpu: ${max_img_per_gpu}
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      debug: True
+      img_nums: ${image_nums}  # Use a range of images for training
+    dataset:
+      _target_: posegam.training.data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_Toys4k/renders3/
+          split: train
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_3D-FUTURE/renders3/
+          split: train
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_HSSD/renders3/
+          split: train
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_ABO/renders3/
+          split: train
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_sketchfab/renders3/
+          split: train
+        - _target_: posegam.training.data.datasets.megapose.GSODataset
+          data_root: /ibex/tmp/TRELLIS-500K/megapose_data/google_scanned_objects/renders3-color/
+          split: train
+        - _target_: posegam.training.data.datasets.megapose.ShapeNetDataset
+          data_root: /ibex/tmp/TRELLIS-500K/megapose_data/shapenetcorev2/renders3-color/
+          split: train
+
+        # Add more datasets as needed
+        # - _target_: posegam.training.data.datasets.another_dataset.AnotherDataset
+        #   data_root: /path/to/third/dataset/
+        #   split: train
+  val:
+    _target_: posegam.training.data.dynamic_dataloader.DynamicTorchDataset
+    num_workers: ${num_workers}
+    max_img_per_gpu: ${max_img_per_gpu}
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      img_nums: ${image_nums}
+    dataset:
+      _target_: posegam.training.data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_Toys4k/renders3/
+          split: test
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_3D-FUTURE/renders3/
+          split: test
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_HSSD/renders3/
+          split: test
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_ABO/renders3/
+          split: test
+        - _target_: posegam.training.data.datasets.posegam_dataset.PoseGAMDataset
+          data_root: /ibex/tmp/TRELLIS-500K/ObjaverseXL_sketchfab/renders3/
+          split: test
+        - _target_: posegam.training.data.datasets.megapose.GSODataset
+          data_root: /ibex/tmp/TRELLIS-500K/megapose_data/google_scanned_objects/renders3-color/
+          split: test
+        - _target_: posegam.training.data.datasets.megapose.ShapeNetDataset
+          data_root: /ibex/tmp/TRELLIS-500K/megapose_data/shapenetcorev2/renders3-color/
+          split: test
+        # Add more validation datasets as needed
+
+logging:
+  log_dir: logs
+  log_visuals: False
+  log_freq: 1
+  log_level_primary: DEBUG
+  log_level_secondary: WARNING
+  all_ranks: False
+  tensorboard_writer:
+    _target_: posegam.training.train_utils.tb_writer.TensorBoardLogger
+    path: ${logging.log_dir}/tensorboard
+  scalar_keys_to_log:
+    train:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_T
+        - loss_R
+        - loss_FL
+        - loss_mask_bce
+        - loss_mask_dice
+    val:
+      keys_to_log:
+        - loss_objective
+        - loss_camera
+        - loss_T
+        - loss_R
+        - loss_FL
+        - loss_mask_bce
+        - loss_mask_dice
+
+
+
+checkpoint:
+  save_dir: logs/${exp_name}/ckpts
+  save_freq: 10
+  resume_checkpoint_path: ''  # Path to a checkpoint to resume from (e.g. posegam.pt); empty = train from scratch
+  strict: False
+
+
+loss:
+  _target_: posegam.training.loss.MultitaskLoss
+  camera:
+    weight: 5.0
+    loss_type: "l1" # The paper uses smooth l1 loss, but we found l1 loss is more stable than smooth l1 and l2 loss.
+  mask:
+    weight: 5.0
+    loss_type: "bce_dice"
+
+
+
+
+optim:
+  param_group_modifiers: False
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 2e-4
+    weight_decay: 0.05
+
+  frozen_module_names:
+      # - "*shape_model*"  # example, freeze the aggregator
+      - "*aggregator.patch_embed*"  # example, freeze the depth head
+      # - "*aggregator.frame_blocks*"
+      # - "*aggregator.global_blocks*"
+
+  amp:
+    enabled: True
+    amp_dtype: bfloat16
+  gradient_clip:
+    _target_: posegam.training.train_utils.gradient_clip.GradientClipper
+    configs:
+      - module_name: ["aggregator"]
+        max_norm: 1.0   # feel free to reduce this if you see instabilities
+        norm_type: 2
+      - module_name: ["camera"]
+        max_norm: 1.0   # feel free to reduce this if you see instabilities
+        norm_type: 2
+      - module_name: ["shape"]
+        max_norm: 1.0   # feel free to reduce this if you see instabilities
+        norm_type: 2
+      - module_name: ["mask_head"]
+        max_norm: 1.0   # feel free to reduce this if you see instabilities
+        norm_type: 2
+  options:
+    lr:
+      # # Lower learning rate for aggregator blocks (0.1x of base lr)
+      - param_names:
+          - "*shape_model*"
+          - "*aggregator.frame_blocks*"
+          - "*aggregator.global_blocks*"
+        scheduler:
+          _target_: fvcore.common.param_scheduler.CompositeParamScheduler
+          schedulers:
+            - _target_: fvcore.common.param_scheduler.LinearParamScheduler
+              start_value: 1e-9  # 0.1 * 1e-8
+              end_value: 5e-5    # 0.1 * 5e-5
+            - _target_: fvcore.common.param_scheduler.CosineParamScheduler
+              start_value: 5e-5  # 0.1 * 5e-5
+              end_value: 1e-9    # 0.1 * 1e-8
+          lengths: [0.05, 0.95]
+          interval_scaling: ['rescaled', 'rescaled']
+      # Default learning rate for all other parameters
+      - scheduler:
+          _target_: fvcore.common.param_scheduler.CompositeParamScheduler
+          schedulers:
+            - _target_: fvcore.common.param_scheduler.LinearParamScheduler
+              start_value: 1e-8
+              end_value: 2e-4
+            - _target_: fvcore.common.param_scheduler.CosineParamScheduler
+              start_value: 2e-4
+              end_value: 1e-8
+          lengths: [0.05, 0.95]
+          interval_scaling: ['rescaled', 'rescaled']
+    weight_decay:
+      - scheduler:
+          _target_: fvcore.common.param_scheduler.ConstantParamScheduler
+          value: 0.05
+
+
+
+
+max_epochs: 100
+
+model:
+  _target_: posegam.models.posegam.PoseGAM
+  enable_camera: True
+  enable_mask: True
+  # Valid input_keys: "world_points", "point_masks", "base_colors"
+  input_keys: ["world_points", "point_masks"]
+
+
+distributed:
+  # check https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html for options
+  backend: nccl
+  comms_dtype: None
+  find_unused_parameters: False
+  timeout_mins: 30
+  gradient_as_bucket_view: True  # Less memory used
+  bucket_cap_mb: 25
+  broadcast_buffers: True
+
+cuda:
+    cudnn_deterministic: False
+    cudnn_benchmark: False
+    allow_tf32: True

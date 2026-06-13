@@ -1,0 +1,46 @@
+# PoseGAM Python dependencies (excluding PyTorch and the CUDA-compiled extras).
+#
+# Install PyTorch and the CUDA-compiled packages FIRST, matched to your CUDA version
+# Tested environment: Python 3.10, CUDA 12.1, torch 2.4.0.
+#
+#   pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
+#   pip install -r requirements.txt
+#   # CUDA-compiled extras (must match torch/CUDA):
+#   pip install git+https://github.com/NVlabs/nvdiffrast.git      # rendering (eval + data prep)
+#   pip install spconv-cu120==2.3.6                               # SONATA backend
+#   pip install torch-scatter -f https://data.pyg.org/whl/torch-2.4.0+cu121.html
+#   pip install git+https://github.com/ashawkey/cubvh             # data prep: remesh (UDF)
+#   pip install diso                                              # data prep: remesh (iso-surface)
+
+numpy==1.26.1
+hydra-core==1.3.2
+omegaconf==2.3.0
+fvcore==0.1.5.post20221221
+iopath==0.1.10
+tensorboard==2.19.0
+Pillow
+opencv-python==4.10.0.84
+scipy==1.11.2
+pandas==2.2.3
+trimesh==4.5.3
+imgaug==0.4.0
+pycocotools==2.0.10
+huggingface_hub==0.36.0
+safetensors==0.4.5
+einops==0.8.0
+timm==1.0.14
+addict==2.4.0
+wcmatch==10.0
+packaging==24.2
+PyYAML==6.0.2
+tqdm==4.67.1
+
+# Data preparation only (the DATASET.md pipeline; not needed for training or evaluation).
+# The remesh step additionally needs the CUDA-compiled cubvh + diso (see the header above).
+bpy==4.0.0
+point_cloud_utils
+utils3d==0.0.2
+easydict==1.13
+objaverse==0.1.7
+diffusers==0.36.0
+controlnet_aux==0.0.10
