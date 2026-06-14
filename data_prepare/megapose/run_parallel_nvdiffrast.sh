@@ -30,10 +30,11 @@ DEVICE="cuda"
 SCRIPT="nvdiffrast_renderer.py"
 # -------------------------------------------
 
-# Render one (shading_mode, output_root) configuration across RANK_SIZE processes.
+# Render one (shading_mode, output_root, [extra args]) configuration across RANK_SIZE processes.
 render_mode () {
     local mode="$1"
     local output_root="$2"
+    local extra="$3"
     echo "=== Rendering '$mode' -> $output_root ==="
     for ((RANK_ID=0; RANK_ID<RANK_SIZE; RANK_ID++)); do
         echo "Starting $mode process $RANK_ID out of $RANK_SIZE"
@@ -46,14 +47,16 @@ render_mode () {
             --camera_radius "$CAMERA_RADIUS" \
             --rank_size "$RANK_SIZE" \
             --rank_id "$RANK_ID" \
+            $extra \
             > "log_${mode}_rank_$RANK_ID.txt" 2>&1 &
     done
     wait
     echo "=== Finished '$mode' ==="
 }
 
-# Color first (writes transforms.json), then normal (reuses those poses).
-render_mode texture "$OUTPUT_BASE/renders3-color/"
+# Color first (writes transforms.json + depth maps), then normal (reuses those poses, and
+# inherits depth from renders3-color -- so --save_depth is passed only to the color pass).
+render_mode texture "$OUTPUT_BASE/renders3-color/" "--save_depth"
 render_mode normal  "$OUTPUT_BASE/renders3-normal/"
 
 echo "All rendering processes finished."

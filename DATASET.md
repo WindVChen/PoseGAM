@@ -179,7 +179,9 @@ reuses depth from the source folder (`renders3-edited` ↔ `renders3`,
 
 `nvdiffrast_renderer.py` re-renders the `renders3` camera poses against the watertight
 meshes to produce per-pixel base color and normals. Run it **twice** — once per shading
-mode. From `data_prepare/posegam-dataset/step5-basecolor-normal/`:
+mode. From `data_prepare/posegam-dataset/step5-basecolor-normal/`. These folders store
+**no depth maps** (the loader reads depth from the matching `renders3*` folder), so
+`--save_depth` is intentionally not passed:
 
 ```bash
 # base color (shader mode 'texture')
@@ -236,11 +238,12 @@ Download into `/ibex/tmp/TRELLIS-500K/megapose_data/`:
 renders the 3D models. As in step 6 it is run per shading mode, and the `texture` (color)
 pass must run before the `normal` pass (the normal pass reuses the poses written by the
 color pass). GSO and ShapeNet are auto-detected from `--mesh_root` and differ in camera
-radius and mesh layout:
+radius and mesh layout. **Depth:** pass `--save_depth` on the **color** pass only — the
+loader reads depth from `renders3-color`, and `renders3-normal` reuses those depth maps.
 
 ```bash
 # Google Scanned Objects (camera_radius 0.4)
-python nvdiffrast_renderer.py --shading_mode texture --camera_radius 0.4 \
+python nvdiffrast_renderer.py --shading_mode texture --camera_radius 0.4 --save_depth \
     --mesh_root   /ibex/tmp/TRELLIS-500K/megapose_data/google_scanned_objects/models_normalized/ \
     --output_root /ibex/tmp/TRELLIS-500K/megapose_data/google_scanned_objects/renders3-color/
 python nvdiffrast_renderer.py --shading_mode normal  --camera_radius 0.4 \
@@ -248,7 +251,7 @@ python nvdiffrast_renderer.py --shading_mode normal  --camera_radius 0.4 \
     --output_root /ibex/tmp/TRELLIS-500K/megapose_data/google_scanned_objects/renders3-normal/
 
 # ShapeNetCoreV2 (camera_radius 0.2)
-python nvdiffrast_renderer.py --shading_mode texture --camera_radius 0.2 \
+python nvdiffrast_renderer.py --shading_mode texture --camera_radius 0.2 --save_depth \
     --mesh_root   /ibex/tmp/TRELLIS-500K/megapose_data/shapenetcorev2/models_orig/ \
     --output_root /ibex/tmp/TRELLIS-500K/megapose_data/shapenetcorev2/renders3-color/
 python nvdiffrast_renderer.py --shading_mode normal  --camera_radius 0.2 \
@@ -366,6 +369,9 @@ auto-selects the split / `--fov_mode` from `DATASET`).
 ### 5. Render base color + normal (nvdiffrast pass)
 
 Reuses the `transforms.json` from step 4, so it must run after it. Run once per mode:
+
+The `-color`/`-normal` folders store **no depth maps** (the eval reads depth from the Blender
+reference views in `$BOP_DIR/<dataset>/`), so `--save_depth` is intentionally not passed:
 
 ```bash
 python nvdiffrast_renderer_BOP.py --shading_mode texture \
