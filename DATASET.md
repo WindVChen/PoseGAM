@@ -326,6 +326,19 @@ python -m src.scripts.download_test_bop23
 > Only `download_test_bop23` is needed. gigapose's `download_bop_templates` /
 > `render_bop_templates` are **not** used — we render our own reference views below.
 
+> **Note — fixing an outdated download URL in gigapose.** The BOP source URL hard-coded in
+> gigapose is stale, so `download_test_bop23` may fail. Patch the two spots below before
+> running it. Both paths are **relative to the gigapose repo**, not this project:
+>
+> 1. In `configs/data/bop.yaml`, set `source_url` to:
+>    `https://huggingface.co/datasets/bop-benchmark`
+> 2. In `src/scripts/download_test_bop23.py`, replace the URL lines (around L77–79) with:
+>    ```python
+>    rgb_url = f"{cfg_data.source_url}/{dataset_name}/resolve/main/{dataset_name}_test{prefix}_bop19.zip"
+>    cad_url = f"{cfg_data.source_url}/{dataset_name}/resolve/main/{dataset_name}_models.zip"
+>    base_url = f"{cfg_data.source_url}/{dataset_name}/resolve/main/{dataset_name}_base.zip"
+>    ```
+
 ### 2. Download the CNOS detections
 
 The eval uses the default BOP-23 CNOS-FastSAM detections. Download and extract the
