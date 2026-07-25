@@ -461,7 +461,7 @@ def setup_args():
     parser.add_argument('--model_path', type=str, help='Path to the PoseGAM model checkpoint', default='./posegam.pt')
     parser.add_argument('--whether_save', action='store_true', default=False, help='Whether to save the evaluation results')
     parser.add_argument('--rank_id', type=int, default=0, help='Rank ID for distributed processing (0-indexed)')
-    parser.add_argument('--total_ranks', type=int, default=4, help='Total number of ranks for distributed processing')
+    parser.add_argument('--total_ranks', type=int, default=1, help='Total number of ranks for distributed processing')
     return parser.parse_args()
 
 
