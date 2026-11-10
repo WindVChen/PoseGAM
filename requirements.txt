@@ -42,5 +42,9 @@ point_cloud_utils
 utils3d==0.0.2
 easydict==1.13
 objaverse==0.1.7
-diffusers==0.36.0
+# FLUX image editing (step4-edit_image). Keep diffusers < 0.35 with torch 2.4: newer versions
+# call scaled_dot_product_attention with `enable_gqa`, which only exists in torch >= 2.5.
+diffusers==0.33.1
+transformers==4.48.0
+sentencepiece==0.2.0
 controlnet_aux==0.0.10

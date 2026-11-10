@@ -34,8 +34,8 @@
 WORK_DIR="$(cd "$(dirname "$0")" && pwd)"          # this step's directory
 mkdir -p "$WORK_DIR/logs"
 
-TOTAL_RANKS=16
-RANKS_PER_GPU=2
+RANKS_PER_GPU=2                     # each rank loads its own FLUX pipeline (~33 GB): 2 per GPU needs an 80 GB GPU
+TOTAL_RANKS=$((8 * RANKS_PER_GPU))  # srun below starts 8 tasks, one per GPU
 # Edit one input/output pair per run: renders3 -> renders3-edited, or
 # renders3-camTrans -> renders3-camTrans-edited.
 INPUT_DIR="/ibex/tmp/TRELLIS-500K/Toys4k/renders3"
@@ -62,7 +62,7 @@ echo "Front angle range: ${FRONT_ANGLE_RANGE}°"
 echo "FLUX parameters: steps=$NUM_INFERENCE_STEPS, guidance=$GUIDANCE_SCALE"
 echo "Debug mode: $ENABLE_DEBUG"
 
-# Run 4 tasks (2 per node across 2 nodes), each handling 2 ranks
+# Run 8 tasks (one GPU each), each handling RANKS_PER_GPU ranks
 srun --ntasks=8 --gpus-per-task=1 --cpus-per-task=4 bash -c "
     cd \"$WORK_DIR\" || exit 1
     source ~/.bashrc

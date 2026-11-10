@@ -6,7 +6,9 @@ This script processes images from the ObjaverseXL_Toys4k dataset, specifically:
 1. Filters images with camera pitch between 15-60 degrees (above object)
 2. Filters images with front-facing camera yaw (not backside views)
 3. Checks object visibility using depth information
-4. Applies Canny edge detection and uses FLUX.1-Canny-dev for image editing
+4. Edits the appearance via noise inversion (paper Sec. 4.2): injects Gaussian noise into the
+   rendering at a random noise level, then denoises it with FLUX.1-Canny-dev conditioned on
+   the rendering's Canny edges and a caption of the object
 5. Applies background masking using original RGBA alpha channel
 6. Saves edited images and updated transforms.json
 
@@ -30,7 +32,7 @@ import numpy as np
 import torch
 from PIL import Image
 from controlnet_aux import CannyDetector
-from diffusers import FluxControlPipeline
+from diffusers import FluxControlImg2ImgPipeline
 import pandas as pd
 
 # Global parameters for processing
@@ -224,9 +226,8 @@ def apply_canny_edge_detection(image: Image.Image) -> Image.Image:
 
 
 def setup_flux_pipeline():
-    """Initialize the FLUX.1-Canny-dev pipeline."""
-    # Load the pipeline directly
-    pipe = FluxControlPipeline.from_pretrained(
+    """Initialize the FLUX.1-Canny-dev pipeline (image-to-image variant, for noise inversion)."""
+    pipe = FluxControlImg2ImgPipeline.from_pretrained(
         "black-forest-labs/FLUX.1-Canny-dev", 
         torch_dtype=torch.bfloat16
     ).to("cuda")
@@ -239,11 +240,16 @@ def edit_image_with_flux(pipe, image: Image.Image, caption: str,
                         guidance_scale: float = 3.5,
                         return_canny: bool = False) -> Image.Image:
     """
-    Edit image using FLUX.1-Canny-dev model.
-    
+    Edit the appearance of a rendering with FLUX.1-Canny-dev via noise inversion.
+
+    The rendering is VAE-encoded, Gaussian noise is injected up to a random noise level
+    (`strength`), and the noisy latent is then denoised conditioned on the rendering's Canny
+    edges and the caption. The edges keep the geometry while the texture changes; a higher
+    strength gives a stronger appearance change.
+
     Args:
-        pipe: FLUX pipeline
-        image: Input image
+        pipe: FluxControlImg2ImgPipeline
+        image: Input RGB rendering
         caption: Text prompt for editing
         num_inference_steps: Number of inference steps
         guidance_scale: Guidance scale for generation
@@ -255,18 +261,18 @@ def edit_image_with_flux(pipe, image: Image.Image, caption: str,
     # Apply Canny edge detection
     canny_image = apply_canny_edge_detection(image)
     
-    # Generate edited image using the correct FluxControlPipeline interface
-    # Randomly set ddim_step_inverse between 0.3 and 0.8
-    ddim_step_inverse = random.uniform(0.3, 0.8)
+    # Noise level of the inversion, sampled per image: only the last ~num_inference_steps * strength
+    # denoising steps are run, starting from the noised latent of `image`.
+    strength = random.uniform(0.3, 0.8)
     result = pipe(
         prompt=caption,
+        image=image,
         control_image=canny_image,
         height=canny_image.height,
         width=canny_image.width,
+        strength=strength,
         num_inference_steps=num_inference_steps,
         guidance_scale=guidance_scale,
-        ddim_step_inverse=ddim_step_inverse,
-        ddim_inverse_image=image,
     ).images[0]
     
     if return_canny:

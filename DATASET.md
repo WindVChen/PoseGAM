@@ -55,14 +55,15 @@ Every step ships a parallel-run shell script (SLURM or plain multi-process) — 
 
 All steps run in the **single project environment** from the
 [Installation](README.md#installation) section — the data-preparation-only packages
-(`bpy`, `point_cloud_utils`, `diffusers`, `controlnet_aux`, `objaverse`, `utils3d`, plus the
-CUDA-compiled `cubvh` + `diso`) are listed in [`requirements.txt`](requirements.txt).
+(`bpy`, `point_cloud_utils`, `diffusers`, `transformers`, `sentencepiece`, `controlnet_aux`,
+`objaverse`, `utils3d`, plus the CUDA-compiled `cubvh` + `diso`) are listed in
+[`requirements.txt`](requirements.txt).
 
 Two extra, non-pip requirements:
 - **Blender 4.2** (rendering, steps 2 & 4): the scripts auto-download it on first run, or set
   the `BLENDER_PATH` environment variable to point at your own install.
-- **FLUX.1-Canny-dev** (step 5, image editing): weights download automatically on first use;
-  needs a GPU with ≈12 GB+ memory.
+- **FLUX.1-Canny-dev** (step 5, image editing): weights download automatically on first use
+  (gated: accept the license on Hugging Face first); needs a GPU with ≈33 GB+ memory.
 
 ---
 
@@ -154,8 +155,9 @@ Each `<sha256>/` folder gets `NNN.png`, `NNN_depth.png` and a `transforms.json`.
 ## Step 5 — Edit rendered images (FLUX.1-Canny-dev)
 
 `edit_image_with_edge.py` re-textures the front-facing, slightly-elevated views with
-edge-controlled FLUX generation, keeping geometry and the transparent background. Run it
-on the `renders3` and `renders3-camTrans` sets. From `data_prepare/posegam-dataset/step4-edit_image/`:
+edge-controlled FLUX generation (noise inversion, Sec. 4.2 of the paper), keeping geometry and
+the transparent background. Run it on the `renders3` and `renders3-camTrans` sets. From
+`data_prepare/posegam-dataset/step4-edit_image/`:
 
 ```bash
 python edit_image_with_edge.py \
